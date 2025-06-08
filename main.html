@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <title>Simulador de Nível</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .lang-btns button {
+      margin-right: 0.5rem;
+    }
+  </style>
+  <link rel="icon" href="favicon.png" type="image/png">
+</head>
+<body class="bg-light">
+  
+  <div class="container mt-4">
+    <header class="d-flex justify-content-between align-items-center p-3">
+      <!-- Logo e título à esquerda -->
+      <div class="d-flex align-items-center">
+        <img src="majestic_rp.png" alt="Majestic RP" style="height: 40px;" class="me-2">
+      </div>
+
+      <!-- Botões de idioma à direita -->
+      <div class="lang-btns d-flex">
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center me-2" onclick="setLanguage('ru')">
+          <img src="https://flagcdn.com/24x18/ru.png" alt="Русский" class="me-1"> Русский
+        </button>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center me-2" onclick="setLanguage('en')">
+          <img src="https://flagcdn.com/24x18/us.png" alt="English" class="me-1"> English
+        </button>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center me-2" onclick="setLanguage('pl')">
+          <img src="https://flagcdn.com/24x18/pl.png" alt="Polski" class="me-1"> Polski
+        </button>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center" onclick="setLanguage('de')">
+          <img src="https://flagcdn.com/24x18/de.png" alt="Deutsch" class="me-1"> Deutsch
+        </button>
+        <button class="btn btn-outline-secondary btn-sm d-flex align-items-center me-2" onclick="setLanguage('pt')">
+          <img src="https://flagcdn.com/24x18/br.png" alt="Português" class="me-1"> Português
+        </button>
+      </div>
+  </header>
+    <h1 class="mb-4 text-center" data-i18n="title">Simulador de Nível</h1>
+
+    <!-- Formulário -->
+    <form id="formulario" class="row g-3">
+      <div class="col-md-4">
+        <label for="nivel" class="form-label" data-i18n="nivel_atual">Nível Atual</label>
+        <input type="number" class="form-control" id="nivel" required>
+      </div>
+      <div class="col-md-4">
+        <label for="dias" class="form-label" data-i18n="dias_restantes">Dias Restantes</label>
+        <input type="number" class="form-control" id="dias" required>
+      </div>
+      <div class="col-md-4">
+        <label for="xp" class="form-label" data-i18n="xp_por_dia">XP por Dia</label>
+        <input type="number" class="form-control" id="xp" required>
+      </div>
+      <div class="col-12 text-center">
+        <button type="submit" class="btn btn-primary mt-3" data-i18n="simular">Simular</button>
+      </div>
+    </form>
+
+    <!-- Abas -->
+    <ul class="nav nav-tabs mt-5" id="myTab" role="tablist">
+      <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="tabela-tab" data-bs-toggle="tab" data-bs-target="#tabela" type="button" role="tab" data-i18n="aba_tabela">Tabela</button>
+      </li>
+      <li class="nav-item" role="presentation">
+        <button class="nav-link" id="grafico-tab" data-bs-toggle="tab" data-bs-target="#grafico" type="button" role="tab" data-i18n="aba_grafico">Gráfico</button>
+      </li>
+    </ul>
+
+    <div class="tab-content" id="myTabContent">
+      <div class="tab-pane fade show active" id="tabela" role="tabpanel">
+        <div class="table-responsive mt-4">
+          <table class="table table-bordered text-center">
+            <thead class="table-light">
+              <tr>
+                <th data-i18n="data">Data</th>
+                <th data-i18n="xp_acumulado">XP Acumulado</th>
+                <th data-i18n="nivel_estimado">Nível Estimado</th>
+              </tr>
+            </thead>
+            <tbody id="resultado"></tbody>
+          </table>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="grafico" role="tabpanel">
+        <div class="mt-4">
+          <canvas id="graficoNivel" height="100"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const traducoes = {
+      pt: {
+        title: "Simulador de Nível",
+        nivel_atual: "Nível Atual",
+        dias_restantes: "Dias Restantes",
+        xp_por_dia: "XP por Dia",
+        simular: "Simular",
+        aba_tabela: "Tabela",
+        aba_grafico: "Gráfico",
+        data: "Data",
+        xp_acumulado: "XP Acumulado",
+        nivel_estimado: "Nível Estimado",
+        grafico_label: "Nível Estimado"
+      },
+      ru: {
+        title: "Симулятор Уровня",
+        nivel_atual: "Текущий Уровень",
+        dias_restantes: "Осталось Дней",
+        xp_por_dia: "Опыт в День",
+        simular: "Смоделировать",
+        aba_tabela: "Таблица",
+        aba_grafico: "График",
+        data: "Дата",
+        xp_acumulado: "Накопленный опыт",
+        nivel_estimado: "Предполагаемый уровень",
+        grafico_label: "Предполагаемый уровень"
+      },
+      en: {
+        title: "Level Simulator",
+        nivel_atual: "Current Level",
+        dias_restantes: "Days Remaining",
+        xp_por_dia: "XP per Day",
+        simular: "Simulate",
+        aba_tabela: "Table",
+        aba_grafico: "Chart",
+        data: "Date",
+        xp_acumulado: "XP Accumulated",
+        nivel_estimado: "Estimated Level",
+        grafico_label: "Estimated Level"
+      },
+      pl: {
+        title: "Symulator Poziomu",
+        nivel_atual: "Aktualny Poziom",
+        dias_restantes: "Pozostałe Dni",
+        xp_por_dia: "XP na Dzień",
+        simular: "Symuluj",
+        aba_tabela: "Tabela",
+        aba_grafico: "Wykres",
+        data: "Data",
+        xp_acumulado: "Zgromadzone XP",
+        nivel_estimado: "Szacowany Poziom",
+        grafico_label: "Szacowany Poziom"
+      },
+      de: {
+        title: "Level-Simulator",
+        nivel_atual: "Aktuelles Level",
+        dias_restantes: "Verbleibende Tage",
+        xp_por_dia: "XP pro Tag",
+        simular: "Simulieren",
+        aba_tabela: "Tabelle",
+        aba_grafico: "Diagramm",
+        data: "Datum",
+        xp_acumulado: "Gesammelte XP",
+        nivel_estimado: "Geschätztes Level",
+        grafico_label: "Geschätztes Level"
+      }
+    };
+
+    let idiomaAtual = "pt";
+    let grafico = null;
+
+    function setLanguage(lang) {
+      idiomaAtual = lang;
+      const trs = traducoes[lang];
+      document.querySelectorAll("[data-i18n]").forEach(el => {
+        const chave = el.getAttribute("data-i18n");
+        if (trs[chave]) el.textContent = trs[chave];
+      });
+
+      // Atualizar gráfico se existir
+      if (grafico) {
+        grafico.options.plugins.legend.labels = { color: '#000' };
+        grafico.data.datasets[0].label = trs["grafico_label"];
+        grafico.update();
+      }
+    }
+
+    document.getElementById("formulario").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const nivelAtual = parseInt(document.getElementById("nivel").value);
+      const diasRestantes = parseInt(document.getElementById("dias").value);
+      const xpPorDia = parseInt(document.getElementById("xp").value);
+
+      const nivelInicial = 300, fator = 220, limite = 100, xpFixo = 15000;
+      const dicionario = {}, xpNivel = {};
+      let xp = nivelInicial;
+
+      for (let i = 1; i <= 200; i++) {
+        if (i === 1) dicionario[i] = xp;
+        else if (i <= limite) {
+          xp += fator;
+          dicionario[i] = xp;
+        } else {
+          dicionario[i] = xpFixo;
+        }
+      }
+
+      let xpTotal = 0;
+      for (let i = 1; i <= 200; i++) {
+        xpTotal += dicionario[i];
+        xpNivel[i] = xpTotal;
+      }
+
+      let xpAtual = 0;
+      for (let i = 1; i < nivelAtual; i++) {
+        xpAtual += dicionario[i];
+      }
+
+      const tbody = document.getElementById("resultado");
+      tbody.innerHTML = "";
+
+      const hoje = new Date();
+      const labels = [], niveis = [];
+
+      for (let dia = 1; dia <= diasRestantes; dia++) {
+        const dataDia = new Date(hoje);
+        dataDia.setDate(hoje.getDate() + dia);
+        const xpGanho = xpAtual + xpPorDia * dia;
+
+        let nivelEst = 1;
+        for (let n = 1; n <= 200; n++) {
+          if (xpNivel[n] > xpGanho) {
+            nivelEst = n;
+            break;
+          }
+        }
+
+        const row = tbody.insertRow();
+        row.insertCell(0).textContent = dataDia.toLocaleDateString();
+        row.insertCell(1).textContent = xpGanho.toLocaleString();
+        row.insertCell(2).textContent = nivelEst;
+
+        labels.push(dataDia.toLocaleDateString());
+        niveis.push(nivelEst);
+      }
+
+      if (grafico) grafico.destroy();
+      grafico = new Chart(document.getElementById("graficoNivel"), {
+        type: "line",
+        data: {
+          labels: labels,
+          datasets: [{
+            label: traducoes[idiomaAtual]["grafico_label"],
+            data: niveis,
+            borderColor: "rgba(75,192,192,1)",
+            backgroundColor: "rgba(75,192,192,0.2)",
+            fill: true,
+            tension: 0.3
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            x: { title: { display: true, text: "Dia" } },
+            y: { title: { display: true, text: "Nível" }, beginAtZero: true }
+          }
+        }
+      });
+    });
+
+    // Carrega o idioma padrão
+    window.onload = () => setLanguage("ru");
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
