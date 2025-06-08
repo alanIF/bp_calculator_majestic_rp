@@ -1,4 +1,4 @@
-# bp_calculator_majestic_rp
+# Calculator Batlepass Majestic RP
 Majestic RP Battle Pass Experience Calculator
 
 # Russo
